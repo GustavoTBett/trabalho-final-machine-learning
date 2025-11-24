@@ -1,19 +1,74 @@
-# 🎈 Blank app template
+# 🏥 Sistema de Predição de Cura da Tuberculose
 
-A simple Streamlit app template for you to modify!
+Aplicação web desenvolvida com Streamlit para predição de cura de tuberculose utilizando modelos de Machine Learning.
 
-[![Open in Streamlit](https://static.streamlit.io/badges/streamlit_badge_black_white.svg)](https://blank-app-template.streamlit.app/)
+## 📋 Descrição
 
-### How to run it on your own machine
+Este sistema utiliza dois modelos de Machine Learning para prever a probabilidade de cura de pacientes com tuberculose:
+- **Regressão Logística**: Modelo linear probabilístico
+- **Árvore de Decisão**: Modelo baseado em regras de decisão
 
-1. Install the requirements
+## 🚀 Funcionalidades
 
-   ```
-   $ pip install -r requirements.txt
-   ```
+- ✅ Comparação de desempenho entre modelos
+- 🔮 Interface para fazer predições em tempo real
+- 📊 Análise exploratória dos dados
+- 📈 Visualizações de métricas e matriz de confusão
+- 📥 Download dos dados processados
 
-2. Run the app
+## 🛠️ Instalação
 
-   ```
-   $ streamlit run streamlit_app.py
-   ```
+1. Clone o repositório:
+```bash
+git clone https://github.com/GustavoTBett/trabalho-final-machine-learning.git
+cd trabalho-final-machine-learning
+```
+
+2. Instale as dependências:
+```bash
+pip install -r requirements.txt
+```
+
+## 💻 Como Usar
+
+1. Execute a aplicação:
+```bash
+streamlit run streamlit_app.py
+```
+
+2. Acesse no navegador: `http://localhost:8501`
+
+3. Navegue pelas páginas:
+   - **Início**: Visão geral do sistema
+   - **Comparação de Modelos**: Métricas e visualizações comparativas
+   - **Fazer Predição**: Interface para predição de novos casos
+   - **Análise dos Dados**: Exploração do dataset
+
+## 📦 Dependências
+
+- streamlit
+- pandas
+- numpy
+- scikit-learn
+- matplotlib
+- seaborn
+
+## 📊 Dataset
+
+O sistema utiliza o arquivo `dados_tuberculose.csv` contendo informações de casos de tuberculose.
+
+## 🎯 Métricas Avaliadas
+
+- Acurácia
+- Precisão
+- Revocação (Recall)
+- F1-Score
+- Matriz de Confusão
+
+## 👥 Autores
+
+Desenvolvido como trabalho final da disciplina de Machine Learning.
+
+## 📄 Licença
+
+Este projeto está sob a licença especificada no arquivo LICENSE.
