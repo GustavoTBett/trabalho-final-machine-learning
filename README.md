@@ -65,6 +65,28 @@ O sistema utiliza o arquivo `dados_tuberculose.csv` contendo informações de ca
 - F1-Score
 - Matriz de Confusão
 
+### 📊 Resultados dos Modelos
+
+#### Árvore de Decisão ⭐ (Recomendado)
+- **Acurácia**: 78.64%
+- **Precisão**: 81.33%
+- **Revocação**: 85.72%
+- **F1-Score**: 83.47%
+
+**Matriz de Confusão:**
+- VN: 1886 | FP: 944
+- FN: 685 | VP: 4113
+
+**Por que é recomendado?**
+- ✅ Melhor identificação de casos de cura (maior revocação)
+- ✅ Menos falsos negativos (crucial em contexto médico)
+- ✅ Melhor F1-Score (equilíbrio entre precisão e revocação)
+
+#### Regressão Logística
+- Modelo alternativo mais conservador
+- Melhor para identificar casos que NÃO serão curados
+- Menos falsos positivos
+
 ## 👥 Autores
 
 Desenvolvido como trabalho final da disciplina de Machine Learning.

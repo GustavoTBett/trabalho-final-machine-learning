@@ -146,15 +146,64 @@ if page == "🏠 Início":
     st.subheader("Sobre o Sistema")
     st.write("""
     Este sistema utiliza técnicas de Machine Learning para prever a probabilidade de cura 
-    de pacientes com tuberculose. Dois modelos foram treinados:
+    de pacientes com tuberculose. Dois modelos foram treinados e comparados:
     
     - **Regressão Logística**: Modelo linear que estima probabilidades
-    - **Árvore de Decisão**: Modelo baseado em regras de decisão
+    - **Árvore de Decisão**: Modelo baseado em regras de decisão ⭐ **(Recomendado)**
     
     Use o menu lateral para:
     - Comparar o desempenho dos modelos
     - Fazer predições para novos casos
     - Analisar os dados
+    """)
+    
+    # Métricas dos modelos
+    metrics_lr = calculate_metrics(models_data['y_test'], models_data['lr']['predictions'])
+    metrics_dt = calculate_metrics(models_data['y_test'], models_data['dt']['predictions'])
+    
+    st.markdown("---")
+    st.subheader("📊 Desempenho dos Modelos")
+    
+    col_m1, col_m2, col_m3, col_m4 = st.columns(4)
+    
+    with col_m1:
+        st.metric(
+            "Acurácia (Árvore)", 
+            f"{metrics_dt['Acurácia']:.2%}",
+            delta=f"{(metrics_dt['Acurácia'] - metrics_lr['Acurácia']):.2%}",
+            help="Porcentagem de predições corretas"
+        )
+    
+    with col_m2:
+        st.metric(
+            "Precisão (Árvore)", 
+            f"{metrics_dt['Precisão']:.2%}",
+            delta=f"{(metrics_dt['Precisão'] - metrics_lr['Precisão']):.2%}",
+            help="Das predições de cura, quantas estavam corretas"
+        )
+    
+    with col_m3:
+        st.metric(
+            "Revocação (Árvore)", 
+            f"{metrics_dt['Revocação']:.2%}",
+            delta=f"{(metrics_dt['Revocação'] - metrics_lr['Revocação']):.2%}",
+            help="Dos casos reais de cura, quantos foram identificados"
+        )
+    
+    with col_m4:
+        st.metric(
+            "F1-Score (Árvore)", 
+            f"{metrics_dt['F1-Score']:.2%}",
+            delta=f"{(metrics_dt['F1-Score'] - metrics_lr['F1-Score']):.2%}",
+            help="Média harmônica entre Precisão e Revocação"
+        )
+    
+    st.info("""
+    **🎯 Por que a Árvore de Decisão é recomendada?**
+    
+    ✅ **Melhor Revocação**: Identifica mais casos de cura (menos falsos negativos)  
+    ✅ **F1-Score Superior**: Melhor equilíbrio entre precisão e revocação  
+    ✅ **Contexto Médico**: Crucial não perder casos de pacientes que podem ser curados  
     """)
 
 # Página Comparação de Modelos
@@ -185,6 +234,19 @@ elif page == "📈 Comparação de Modelos":
     ax.set_xticklabels(ax.get_xticklabels(), rotation=0)
     st.pyplot(fig)
     
+    # Análise de Matrizes de Confusão
+    cm_lr = confusion_matrix(models_data['y_test'], models_data['lr']['predictions'])
+    cm_dt = confusion_matrix(models_data['y_test'], models_data['dt']['predictions'])
+    
+    tn_lr, fp_lr, fn_lr, tp_lr = cm_lr.ravel()
+    tn_dt, fp_dt, fn_dt, tp_dt = cm_dt.ravel()
+    
+    # Destaque das melhorias
+    st.success("""🎯 **Análise dos Resultados:**
+    A Árvore de Decisão apresenta desempenho superior para **identificar casos de CURA** 
+    com menos falsos negativos e mais verdadeiros positivos, tornando-a ideal para contextos 
+    médicos onde detectar a cura é prioritário.""")
+    
     # Matrizes de confusão
     st.subheader("Matrizes de Confusão")
     col1, col2 = st.columns(2)
@@ -197,15 +259,98 @@ elif page == "📈 Comparação de Modelos":
             'Regressão Logística'
         )
         st.pyplot(fig_lr)
+        
+        # Detalhamento da matriz
+        st.info(f"""
+        **Detalhamento:**
+        - VN (Verdadeiros Negativos): {tn_lr}
+        - FP (Falsos Positivos): {fp_lr}
+        - FN (Falsos Negativos): {fn_lr}
+        - VP (Verdadeiros Positivos): {tp_lr}
+        """)
     
     with col2:
-        st.write("**Árvore de Decisão**")
+        st.write("**Árvore de Decisão** ⭐")
         fig_dt = plot_confusion_matrix(
             models_data['y_test'], 
             models_data['dt']['predictions'],
             'Árvore de Decisão'
         )
         st.pyplot(fig_dt)
+        
+        # Detalhamento da matriz com melhorias
+        st.success(f"""
+        **Detalhamento:**
+        - VN (Verdadeiros Negativos): {tn_dt}
+        - FP (Falsos Positivos): {fp_dt}
+        - FN (Falsos Negativos): {fn_dt} ✅ **Menor!**
+        - VP (Verdadeiros Positivos): {tp_dt} ✅ **Maior!**
+        """)
+    
+    # Análise Comparativa Detalhada
+    st.markdown("---")
+    st.subheader("📊 Análise Comparativa Detalhada")
+    
+    # Tabela de comparação da matriz de confusão
+    comparison_cm = pd.DataFrame({
+        'Métrica': ['VN (Verdadeiros Negativos)', 'FP (Falsos Positivos)', 
+                    'FN (Falsos Negativos)', 'VP (Verdadeiros Positivos)'],
+        'Regressão Logística': [tn_lr, fp_lr, fn_lr, tp_lr],
+        'Árvore de Decisão': [tn_dt, fp_dt, fn_dt, tp_dt],
+        'Diferença': [tn_dt - tn_lr, fp_dt - fp_lr, fn_dt - fn_lr, tp_dt - tp_lr]
+    })
+    
+    st.dataframe(comparison_cm)
+    
+    # Interpretação
+    st.subheader("🎯 Qual Modelo Escolher?")
+    
+    col_a, col_b = st.columns(2)
+    
+    with col_a:
+        st.info(f"""
+        **✅ Escolha a Árvore de Decisão se:**
+        
+        - O objetivo principal é **identificar quem será curado** (maximizar VP)
+        - É crucial **reduzir falsos negativos** (não perder casos de cura)
+        - O contexto permite tolerar alguns falsos positivos
+        - **Revocação alta** é prioritária
+        
+        **📈 Vantagens:**
+        - FN menores: {fn_dt} vs {fn_lr}
+        - VP maiores: {tp_dt} vs {tp_lr}
+        - Melhor para prever CURA
+        """)
+    
+    with col_b:
+        st.warning(f"""
+        **⚖️ Escolha a Regressão Logística se:**
+        
+        - O objetivo é **identificar quem NÃO será curado** (maximizar VN)
+        - É importante **reduzir falsos positivos** (evitar prognósticos incorretos)
+        - **Precisão** é mais importante que revocação
+        - Modelo mais conservador é preferível
+        
+        **📉 Vantagens:**
+        - FP menores: {fp_lr} vs {fp_dt}
+        - VN maiores: {tn_lr} vs {tn_dt}
+        - Mais segura para prever NÃO CURA
+        """)
+    
+    # Recomendação final
+    st.markdown("---")
+    if metrics_dt['Revocação'] > metrics_lr['Revocação'] and metrics_dt['F1-Score'] > metrics_lr['F1-Score']:
+        st.success(f"""
+        ### 🏆 Recomendação: **Árvore de Decisão**
+        
+        Para este projeto de predição de cura da tuberculose, a **Árvore de Decisão** é recomendada porque:
+        - Apresenta melhor **Revocação** ({metrics_dt['Revocação']:.4f} vs {metrics_lr['Revocação']:.4f}), identificando mais casos de cura
+        - Menor taxa de **Falsos Negativos** ({fn_dt} vs {fn_lr}), crucial em contexto médico
+        - Melhor **F1-Score** ({metrics_dt['F1-Score']:.4f} vs {metrics_lr['F1-Score']:.4f}), indicando equilíbrio entre precisão e revocação
+        - Mais **Verdadeiros Positivos** ({tp_dt} vs {tp_lr}), captando mais casos de sucesso no tratamento
+        """)
+    else:
+        st.info("### ⚖️ Recomendação: Avaliar contexto de uso")
 
 # Página Fazer Predição
 elif page == "🔮 Fazer Predição":
@@ -214,10 +359,30 @@ elif page == "🔮 Fazer Predição":
     # Seleção do modelo
     model_choice = st.selectbox(
         "Escolha o modelo:",
-        ["Regressão Logística", "Árvore de Decisão"]
+        ["Árvore de Decisão ⭐ (Recomendado)", "Regressão Logística"],
+        help="A Árvore de Decisão apresenta melhor desempenho na identificação de casos de cura"
     )
     
     selected_model = models_data['lr']['model'] if model_choice == "Regressão Logística" else models_data['dt']['model']
+    
+    # Informação sobre o modelo escolhido
+    if "Árvore" in model_choice:
+        st.success("""
+        ✅ **Árvore de Decisão selecionada**
+        
+        Este modelo é recomendado por apresentar:
+        - 🎯 Maior taxa de identificação de casos de cura (Revocação: 85.72%)
+        - 📊 Melhor F1-Score (83.47%)
+        - ✅ Menos falsos negativos (685 casos)
+        """)
+    else:
+        st.info("""
+        ℹ️ **Regressão Logística selecionada**
+        
+        Este modelo é mais conservador e apresenta:
+        - 🎯 Menos falsos positivos
+        - 📊 Melhor identificação de casos que não serão curados
+        """)
     
     st.markdown("---")
     st.subheader("Preencha as informações do paciente")
