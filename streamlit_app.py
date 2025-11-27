@@ -68,12 +68,13 @@ def train_models(dataset_encoded):
     modelo_lr.fit(X_train, y_train)
     y_pred_lr = modelo_lr.predict(X_test)
     
-    # Modelo de Árvore de Decisão
+    # Modelo de Árvore de Decisão (Otimizado)
     modelo_dt = DecisionTreeClassifier(
         criterion='gini',
-        max_depth=None,
-        min_samples_split=2,
-        min_samples_leaf=1,
+        max_depth=20,
+        min_samples_split=10,
+        min_samples_leaf=5,
+        ccp_alpha=0.0005,
         random_state=42
     )
     modelo_dt.fit(X_train, y_train)
